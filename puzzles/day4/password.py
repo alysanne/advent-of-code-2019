@@ -2,7 +2,7 @@ def calc_possible_passwords(start, end):
     count = 0
 
     for n in range(int(start), int(end) + 1):
-        valid = check_if_valid(n)
+        valid = check_if_valid(str(n))
 
         if valid:
             count += 1
@@ -11,31 +11,36 @@ def calc_possible_passwords(start, end):
 
 
 def check_if_valid(password):
-    str_pwd = str(password)
-    rules = {'equals': False, 'increase': True}
-    for k in range(len(str_pwd) - 1):
-        rules['equals'] = rules['equals'] or _check_equals(str_pwd[k], str_pwd[k+1])
-        rules['increase'] = rules['increase'] and _check_increase(str_pwd[k], str_pwd[k + 1])
+    digit_count = {}
+    prev_digit = 0
 
-    if not rules['equals'] or not rules['increase']:
-        return False
-    return True
+    for digit in password:
+        _count_equals(digit, digit_count)
+        if not _digits_increase(digit, prev_digit):
+            return False
+
+        prev_digit = int(digit)
+
+    if 2 in digit_count.values():
+        return True
+    return False
 
 
-def _check_equals(a, b):
+def _count_equals(digit, digit_count):
     # Rules:
     # Two adjacent digits are the same (like 22 in 122345).
-    if a == b:
-        return True
-    return False
+    if digit in digit_count:
+        digit_count[digit] += 1
+    else:
+        digit_count[digit] = 1
 
 
-def _check_increase(a, b):
+def _digits_increase(digit, prev_digit):
     # Rules:
     # From left to right, the digits never decrease; they only ever increase or stay the same (like 111123 or 135679).
-    if int(a) <= int(b):
-        return True
-    return False
+    if prev_digit > int(digit):
+        return False
+    return True
 
 
 if __name__ == "__main__":
