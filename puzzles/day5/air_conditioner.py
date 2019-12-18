@@ -1,9 +1,11 @@
 from day2.intcode import handle_math_ops, get_value_for_mode
 
 
-def process_intcode(values, input_programme):
+def process_intcode(values, inputs):
     i = 0
     step = 0
+    outputs = []
+
     while i < len(values):
         op_code = values[i] % 100
         modes = str(values[i])[:-2]
@@ -19,14 +21,16 @@ def process_intcode(values, input_programme):
 
         # op_code 3: input
         if op_code == 3:
+            input_value = inputs.pop(0) if isinstance(inputs, list) else inputs
             position = values[i+1]
-            values[position] = input_programme
+            values[position] = input_value
             step = 2
 
         # op_code 4: output
         if op_code == 4:
             value = get_value_for_mode(i, 1, modes, values)
             print(value)
+            outputs.append(value)
             step = 2
 
         # op_code 5: jump if non-zero
@@ -45,7 +49,7 @@ def process_intcode(values, input_programme):
         # Skip to next instruction
         i += step
 
-    return values
+    return outputs
 
 
 def handle_jump_ops(i, op_code, modes, values):
